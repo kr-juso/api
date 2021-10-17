@@ -1,0 +1,3 @@
+[submodule "api/protobuf"]
+	path = api/protobuf
+	url = git@github.com:kr-juso/protobuf.git
