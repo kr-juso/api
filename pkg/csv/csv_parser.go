@@ -4,8 +4,9 @@ import (
 	"bytes"
 	_ "embed"
 	"encoding/csv"
+
+	"github.com/kr-juso/api/internal/wildcard"
 	"github.com/kr-juso/api/pkg/model"
-	"strings"
 )
 
 //go:embed internal/address.csv
@@ -40,14 +41,7 @@ func GetRegcodes(codePattern string) []model.Regcode {
 	result := make([]model.Regcode, 0)
 
 	for _, regcode := range regcodes {
-		isContains := false
-		if strings.HasPrefix(codePattern, "*") {
-			isContains = strings.HasSuffix(regcode.Code, strings.ReplaceAll(codePattern, "*", ""))
-		} else if strings.HasSuffix(codePattern, "*") {
-			isContains = strings.HasPrefix(regcode.Code, strings.ReplaceAll(codePattern, "*", ""))
-		}
-
-		if isContains {
+		if wildcard.IsMatch(regcode.Code, codePattern) {
 			result = append(result, regcode)
 		}
 	}

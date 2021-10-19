@@ -3,14 +3,30 @@ package service
 import (
 	"context"
 	pb "github.com/kr-juso/api/internal/grpc/juso/regcode"
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
+	"github.com/kr-juso/api/pkg/csv"
 )
 
 type RegcodeService struct {
 	pb.UnimplementedRegcodeServiceServer
 }
 
-func (service *RegcodeService) GetRegcodes(context.Context, *pb.GetRegcodesRequest) (*pb.GetRegcodesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRegcodes not implemented")
+func (service *RegcodeService) GetRegcodes(ctx context.Context, req *pb.GetRegcodesRequest) (*pb.GetRegcodesResponse, error) {
+	regCodes := csv.GetRegcodes(req.GetRegcodePattern())
+
+	result := make([]*pb.Regcode, 0)
+
+	for _, item := range regCodes {
+		regCode := &pb.Regcode{
+			Code: item.Code,
+			Name: item.Name,
+		}
+
+		result = append(result, regCode)
+	}
+
+	response := &pb.GetRegcodesResponse{
+		Results: result,
+	}
+
+	return response, nil
 }
