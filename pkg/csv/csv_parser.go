@@ -28,9 +28,11 @@ func init() {
 	regcodes = make([]model.Regcode, len(rows))
 
 	for i, row := range rows {
-		regcodes[i] = model.Regcode{
-			Code: row[0],
-			Name: row[1],
+		if row[2] == "존재" {
+			regcodes[i] = model.Regcode{
+				Code: row[0],
+				Name: row[1],
+			}
 		}
 	}
 }
