@@ -11,7 +11,10 @@ type RegcodeService struct {
 }
 
 func (service *RegcodeService) GetRegcodes(ctx context.Context, req *pb.GetRegcodesRequest) (*pb.GetRegcodesResponse, error) {
-	regCodes := csv.GetRegcodes(req.GetRegcodePattern())
+	regCodes := csv.GetRegcodes(
+		req.RegcodePattern,
+		req.IsIgnoreZero,
+	)
 
 	result := make([]*pb.Regcode, 0)
 

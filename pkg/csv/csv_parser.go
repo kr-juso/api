@@ -5,6 +5,8 @@ import (
 	_ "embed"
 	"encoding/csv"
 
+	"strings"
+
 	"github.com/kr-juso/api/internal/wildcard"
 	"github.com/kr-juso/api/pkg/model"
 )
@@ -39,14 +41,36 @@ func init() {
 
 // codePattern이 00000000* 패턴일 경우 strings.HasPrefix 체크
 // codePattern이 *00000000 패턴일 경우 strings.HasSuffix 체크
-func GetRegcodes(codePattern string) []model.Regcode {
+func GetRegcodes(codePattern string, isIgnoreZero bool) []model.Regcode {
 	result := make([]model.Regcode, 0)
 
 	for _, regcode := range regcodes {
-		if wildcard.IsMatch(regcode.Code, codePattern) {
+		isOk := wildcard.IsMatch(regcode.Code, codePattern)
+		if isIgnoreZero {
+			isOk = isOk && !isStarStartsWithZero(regcode.Code, codePattern)
+		}
+
+		if isOk {
 			result = append(result, regcode)
 		}
 	}
 
 	return result
+}
+
+func isStarStartsWithZero(regcode, codePattern string) bool {
+	starPosition := strings.Index(codePattern, "*")
+	if starPosition == -1 {
+		return false
+	}
+
+	return regcode[starPosition:min(len(regcode), starPosition+2)] == "00"
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+
+	return b
 }
