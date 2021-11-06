@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RegcodeServiceClient interface {
-	GetRegcodes(ctx context.Context, in *GetRegcodesRequest, opts ...grpc.CallOption) (*GetRegcodesResponse, error)
+	ListRegcodes(ctx context.Context, in *ListRegcodesRequest, opts ...grpc.CallOption) (*ListRegcodesResponse, error)
 }
 
 type regcodeServiceClient struct {
@@ -29,9 +29,9 @@ func NewRegcodeServiceClient(cc grpc.ClientConnInterface) RegcodeServiceClient {
 	return &regcodeServiceClient{cc}
 }
 
-func (c *regcodeServiceClient) GetRegcodes(ctx context.Context, in *GetRegcodesRequest, opts ...grpc.CallOption) (*GetRegcodesResponse, error) {
-	out := new(GetRegcodesResponse)
-	err := c.cc.Invoke(ctx, "/juso.regcode.RegcodeService/GetRegcodes", in, out, opts...)
+func (c *regcodeServiceClient) ListRegcodes(ctx context.Context, in *ListRegcodesRequest, opts ...grpc.CallOption) (*ListRegcodesResponse, error) {
+	out := new(ListRegcodesResponse)
+	err := c.cc.Invoke(ctx, "/juso.regcode.RegcodeService/ListRegcodes", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *regcodeServiceClient) GetRegcodes(ctx context.Context, in *GetRegcodesR
 // All implementations must embed UnimplementedRegcodeServiceServer
 // for forward compatibility
 type RegcodeServiceServer interface {
-	GetRegcodes(context.Context, *GetRegcodesRequest) (*GetRegcodesResponse, error)
+	ListRegcodes(context.Context, *ListRegcodesRequest) (*ListRegcodesResponse, error)
 	mustEmbedUnimplementedRegcodeServiceServer()
 }
 
@@ -50,8 +50,8 @@ type RegcodeServiceServer interface {
 type UnimplementedRegcodeServiceServer struct {
 }
 
-func (UnimplementedRegcodeServiceServer) GetRegcodes(context.Context, *GetRegcodesRequest) (*GetRegcodesResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetRegcodes not implemented")
+func (UnimplementedRegcodeServiceServer) ListRegcodes(context.Context, *ListRegcodesRequest) (*ListRegcodesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListRegcodes not implemented")
 }
 func (UnimplementedRegcodeServiceServer) mustEmbedUnimplementedRegcodeServiceServer() {}
 
@@ -66,20 +66,20 @@ func RegisterRegcodeServiceServer(s grpc.ServiceRegistrar, srv RegcodeServiceSer
 	s.RegisterService(&RegcodeService_ServiceDesc, srv)
 }
 
-func _RegcodeService_GetRegcodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetRegcodesRequest)
+func _RegcodeService_ListRegcodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRegcodesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RegcodeServiceServer).GetRegcodes(ctx, in)
+		return srv.(RegcodeServiceServer).ListRegcodes(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/juso.regcode.RegcodeService/GetRegcodes",
+		FullMethod: "/juso.regcode.RegcodeService/ListRegcodes",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RegcodeServiceServer).GetRegcodes(ctx, req.(*GetRegcodesRequest))
+		return srv.(RegcodeServiceServer).ListRegcodes(ctx, req.(*ListRegcodesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -92,8 +92,8 @@ var RegcodeService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*RegcodeServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetRegcodes",
-			Handler:    _RegcodeService_GetRegcodes_Handler,
+			MethodName: "ListRegcodes",
+			Handler:    _RegcodeService_ListRegcodes_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

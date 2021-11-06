@@ -10,7 +10,7 @@ type RegcodeService struct {
 	pb.UnimplementedRegcodeServiceServer
 }
 
-func (service *RegcodeService) GetRegcodes(ctx context.Context, req *pb.GetRegcodesRequest) (*pb.GetRegcodesResponse, error) {
+func (service *RegcodeService) ListRegcodes(ctx context.Context, req *pb.ListRegcodesRequest) (*pb.ListRegcodesResponse, error) {
 	regCodes := csv.GetRegcodes(
 		req.RegcodePattern,
 		req.IsIgnoreZero,
@@ -27,8 +27,8 @@ func (service *RegcodeService) GetRegcodes(ctx context.Context, req *pb.GetRegco
 		result = append(result, regCode)
 	}
 
-	response := &pb.GetRegcodesResponse{
-		Results: result,
+	response := &pb.ListRegcodesResponse{
+		Regcodes: result,
 	}
 
 	return response, nil
