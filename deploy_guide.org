@@ -1,0 +1,47 @@
+#+TITLE: 대한민국 법정동 코드 목록 조회 API
+#+AUTHOR: YeongCheon Kim
+
+* generate gRPC code
+#+BEGIN_SRC
+protoc \
+    --include_imports \
+    --include_source_info \
+    --proto_path=. \
+    -I./api/protobuf \
+    -I./api/protobuf/googleapis \
+    --go_out=./internal/grpc \
+    --go-grpc_out=./internal/grpc \
+    --descriptor_set_out=api_descriptor.pb \
+    api/protobuf/juso/juso.proto
+#+END_SRC
+
+* build command
+
+#+BEGIN_SRC
+go build -o juso_regcode cmd/main.go
+docker build -t asia-docker.pkg.dev/kr-juso/juso/api-grpc .
+docker push asia-docker.pkg.dev/kr-juso/juso/api-grpc
+gcloud run deploy grpc-server --image asia-docker.pkg.dev/kr-juso/juso/api-grpc --platform managed --region asia-northeast3
+#+END_SRC
+
+
+* endpoint deploy command
+
+[[https://cloud.google.com/endpoints/docs/grpc/get-started-cloud-run#deploy_esp][guide 참고]]
+
+#+BEGIN_SRC
+gcloud endpoints services deploy api_descriptor.pb api_config.yaml
+
+./gcloud_build_image.sh \
+    -s grpc-server-mkvo6j4wsq-du.a.run.app \
+    -c 2021-11-06r0 \
+    -p kr-juso
+
+gcloud run deploy grpc-proxy-server \
+  --image="gcr.io/kr-juso/endpoints-runtime-serverless:2.32.0-grpc-server-mkvo6j4wsq-du.a.run.app-2021-11-06r0" \
+  --set-env-vars=ESPv2_ARGS=^++^--cors_preset=basic++--cors_allow_headers="*" \
+  --allow-unauthenticated \
+  --platform managed \
+  --region asia-northeast3 \
+  --project kr-juso
+#+END_SRC

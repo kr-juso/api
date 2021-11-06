@@ -1,0 +1,18 @@
+# The configuration schema is defined by the service.proto file.
+# https://github.com/googleapis/googleapis/blob/master/google/api/service.proto
+
+type: google.api.Service
+config_version: 3
+name: grpc-server-mkvo6j4wsq-du.a.run.app
+title: Juso gRPC Server
+apis:
+  - name: juso.regcode.RegcodeService
+usage:
+  rules:
+  # ListShelves methods can be called without an API Key.
+  - selector: "*"
+    allow_unregistered_calls: true
+backend:
+  rules:
+  - selector: "*"
+    address: grpcs://grpc-server-mkvo6j4wsq-du.a.run.app
