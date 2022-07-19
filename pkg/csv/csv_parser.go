@@ -11,7 +11,7 @@ import (
 	"github.com/kr-juso/api/pkg/model"
 )
 
-//go:embed internal/administrationCode.tsv
+//go:embed internal/address.csv
 var address []byte
 var regcodes []model.Regcode
 
@@ -30,19 +30,10 @@ func init() {
 	regcodes = make([]model.Regcode, len(rows))
 
 	for i, row := range rows {
-		if row[5] == "" {
-			nameArray := []string{
-				row[1],
-				row[2],
-				row[3],
-			}
-			name := strings.TrimSpace(
-				strings.Join(nameArray, " "),
-			)
-
+		if row[2] == "존재" {
 			regcodes[i] = model.Regcode{
 				Code: row[0],
-				Name: name,
+				Name: row[1],
 			}
 		}
 	}
