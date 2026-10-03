@@ -62,4 +62,10 @@ npx wrangler dev     # curl 'localhost:8787/v1/regcodes?regcodePattern=1111*&isI
 npx wrangler deploy
 #+END_SRC
 
-도메인(juso.dev)을 연결하려면 =wrangler.jsonc= 의 routes 주석을 풀고 도메인을 Cloudflare에 등록한다.
+=wrangler.jsonc= 에 =api.juso.dev= 커스텀 도메인이 설정되어 있다. 배포하려면 juso.dev 존이 같은
+Cloudflare 계정에 있어야 하고(네임서버를 Cloudflare로 변경), 기존 =api.juso.dev= DNS 레코드(GCP를
+가리키는 CNAME/A)가 있으면 먼저 삭제해야 한다. 배포 후 확인:
+
+#+BEGIN_SRC
+curl -si 'https://api.juso.dev/v1/regcodes?regcodePattern=1111*' | grep -i x-cache   # 두 번째 요청부터 HIT
+#+END_SRC
