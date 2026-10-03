@@ -16,8 +16,11 @@ fn cors() -> Cors {
         .with_allowed_headers(["*"])
 }
 
+// 법정동 데이터는 배포 때만 바뀌므로 하루 캐시한다.
+const CACHE_CONTROL: &str = "public, max-age=86400";
+
 #[event(fetch)]
-async fn fetch(req: Request, _env: Env, _ctx: Context) -> Result<Response> {
+async fn fetch(req: Request, _env: Env, ctx: Context) -> Result<Response> {
     if req.method() == Method::Options {
         return Response::empty()?.with_cors(&cors());
     }
@@ -25,6 +28,15 @@ async fn fetch(req: Request, _env: Env, _ctx: Context) -> Result<Response> {
     let url = req.url()?;
     if req.method() != Method::Get || url.path() != "/v1/regcodes" {
         return Response::error("Not Found", 404)?.with_cors(&cors());
+    }
+
+    let cache = Cache::default();
+    if let Some(mut hit) = cache.get(&req, false).await? {
+        // 캐시에서 꺼낸 응답의 헤더는 immutable이라 복사해서 x-cache를 붙인다.
+        let headers = hit.headers().clone();
+        let mut resp = Response::from_bytes(hit.bytes().await?)?.with_headers(headers);
+        resp.headers_mut().set("x-cache", "HIT")?;
+        return Ok(resp);
     }
 
     // gRPC transcoding 호환: regcodePattern / regcode_pattern, isIgnoreZero / is_ignore_zero
@@ -39,5 +51,14 @@ async fn fetch(req: Request, _env: Env, _ctx: Context) -> Result<Response> {
     let body = ListRegcodesResponse {
         regcodes: regcode::list_regcodes(&pattern, ignore_zero),
     };
-    Response::from_json(&body)?.with_cors(&cors())
+    let mut resp = Response::from_json(&body)?.with_cors(&cors())?;
+    resp.headers_mut().set("cache-control", CACHE_CONTROL)?;
+
+    let to_cache = resp.cloned()?;
+    ctx.wait_until(async move {
+        let _ = Cache::default().put(&req, to_cache).await;
+    });
+
+    resp.headers_mut().set("x-cache", "MISS")?;
+    Ok(resp)
 }
