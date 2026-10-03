@@ -1,0 +1,12 @@
+{
+  "name": "juso-api",
+  "main": "build/worker/shim.mjs",
+  "compatibility_date": "2026-10-01",
+  "build": {
+    "command": "worker-build --release"
+  },
+  // juso.dev 존이 같은 Cloudflare 계정에 있어야 한다. 배포 시 DNS 레코드와 인증서가 자동 생성된다.
+  "routes": [{ "pattern": "api.juso.dev", "custom_domain": true }],
+  // Cache API는 workers.dev에서 동작하지 않으므로 커스텀 도메인으로만 서비스한다.
+  "workers_dev": false
+}
