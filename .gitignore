@@ -75,3 +75,6 @@ flycheck_*.el
 /Godeps/
 
 # End of https://www.toptal.com/developers/gitignore/api/emacs,go
+
+# Claude Code
+.claude/
