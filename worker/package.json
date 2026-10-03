@@ -1,0 +1,14 @@
+{
+  "name": "juso-api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:data": "node scripts/build-data.mjs",
+    "dev": "npm run build:data && wrangler dev",
+    "deploy": "npm run build:data && wrangler deploy",
+    "test": "npm run build:data && node --experimental-strip-types --test test/*.test.ts"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}

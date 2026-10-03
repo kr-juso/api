@@ -45,3 +45,20 @@ gcloud run deploy grpc-proxy-server \
   --region asia-northeast3 \
   --project kr-juso
 #+END_SRC
+
+* Cloudflare Workers 배포 (GCP Cloud Run + ESPv2 대체)
+
+Workers는 gRPC 서버를 직접 호스팅할 수 없어서, ESPv2가 하던 REST 변환(~GET /v1/regcodes~)을
+=worker/= 의 TypeScript Worker가 직접 처리한다. 데이터(=pkg/csv/internal/address.csv=)는 빌드 시
+JSON으로 변환해 번들에 포함한다.
+
+#+BEGIN_SRC
+cd worker
+npm install
+npm test
+npx wrangler login
+npm run dev      # curl 'localhost:8787/v1/regcodes?regcodePattern=1111*&isIgnoreZero=true'
+npm run deploy
+#+END_SRC
+
+도메인(juso.dev)을 연결하려면 =wrangler.jsonc= 의 routes 주석을 풀고 도메인을 Cloudflare에 등록한다.

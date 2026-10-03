@@ -1,0 +1,7 @@
+{
+  "name": "juso-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01"
+  // 커스텀 도메인 연결 시:
+  // "routes": [{ "pattern": "api.juso.dev", "custom_domain": true }]
+}
